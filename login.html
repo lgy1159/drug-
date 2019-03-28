@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>欢迎用户登录</title>
+    <link rel="stylesheet" type="text/css" href="css/normalize.css"/>
+    <link rel="stylesheet" type="text/css" href="css/demo.css"/>
+    <!--必要样式-->
+    <link rel="stylesheet" type="text/css" href="css/component.css"/>
+    <!--[if IE]>
+    <script src="js/html5.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="container demo-1">
+    <div class="content">
+        <div id="large-header" class="large-header">
+            <canvas id="demo-canvas"></canvas>
+            <div class="logo_box">
+                <h3>欢迎用户登录</h3>
+                <div class="input_outer">
+                    <span class="u_user"></span>
+                    <input name="logname" class="text" id="username" style="color: #FFFFFF !important" type="text"
+                           placeholder="请输入账户">
+                </div>
+                <div class="input_outer">
+                    <span class="us_uer"></span>
+                    <input name="logpass" class="text" id="password"
+                           style="color: #FFFFFF !important; position:absolute; z-index:100;" type="password"
+                           placeholder="请输入密码">
+                </div>
+                <div class="mb2" id="error_message">
+                    <input class="act-but button" type="submit" id='login' name='login' value="登录">
+                    <input class="act-but button" type="submit" id='quit' name='quit' value="返回">
+                </div>
+                <div id="success"></div>
+                <script src="js/TweenLite.min.js"></script>
+                <script src="js/EasePack.min.js"></script>
+                <script src="js/rAF.js"></script>
+                <script src="js/demo-1.js"></script>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+<script type="text/javascript">
+    document.getElementById("quit").onclick = function () {
+
+        location.href = 'index.html';
+    };
+
+    document.getElementById("login").onclick = function () {
+        var name = document.getElementById("username").value;
+        var pwd = document.getElementById("password").value;
+        var oError = document.getElementById("error_message");
+        var isNotError = true;
+        if (name == "") {
+            alert("警告:用户名为空 ");
+            isNotError = false;
+            return;
+        } else if (pwd == "") {
+            alert("警告:密码为空 ");
+            isNotError = false;
+            return;
+        }
+        //创建XHR对象
+        var xhr = new XMLHttpRequest();
+        //设置请求URL
+        console.log(name)
+        var url = "./success.php?username=" + name + "&password=" + pwd;
+        //设置XHR对象readyState变化时响应函数
+        xhr.onreadystatechange = function () {
+            var success = document.getElementById("success");
+            //readyState是请求的状态，为4表示请求结束
+            if (xhr.readyState == 4) {
+                //responseText服务器响应的内容
+                var data = eval(this.responseText);
+                for (var index in data) {
+                    if (data[index].code == 1) {
+                        alert(data[index].message);//密码错误
+                    } else if (data[index].code == 2) {
+                        alert(data[index].message);//您已经登入了
+                        success.innerHTML = "用户名：" + data[index].session +
+                            "---" +
+                            "<a href='logout.php' class='act-but-3'>注销  </a> "
+                            + "or" +
+                            "<a href='about.php' class='act-but-3'>进入官网</a>";
+                    } else if (data[index].code == 3) {
+                        alert(data[index].message);//登录成功
+                        success.innerHTML = "您好！" + data[index].session + ",欢迎回来！" +
+                            "<a  href='logout.php' class='act-but-3'>注销   </a>  " + "or" +
+                            "<a href='about.php'class='act-but-3'>进入官网</a>";
+                    }
+                    else if (data[index].code == 4) {
+                        alert(data[index].message);//没有此用户,请重新登录
+                        location.href = 'login.html';
+                    }
+                }
+            }
+        };
+        //打开链接
+        xhr.open("get", url, true);
+        //发送请求
+        xhr.send();
+    }
+</script>
+</html>
